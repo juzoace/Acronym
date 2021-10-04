@@ -8,18 +8,18 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const config = require("./config");
 const fs = require("fs");
-const Acronym = require("./models/acronym");
+const Acronym = require("./acronymModel");
 require("dotenv").config();
 app.use(helmet());
 
 app.use(bodyParser.urlencoded({
-    extended: false
+    extended: true
 }));
-
+app.use(express.json());
 app.use(cors());
 
 // Bring in the route
-app.use(require('./routes'));
+app.use(require('./acronymRoute'));
 
 // Swagger Open Api Options Definition 
 const swaggerOptions = {
@@ -63,8 +63,16 @@ const swaggerOptions = {
       // Load the data from the json file
       const dataFromJsonFile = JSON.parse(
         fs.readFileSync(`${__dirname}/acronym.json`, "utf-8")
-      )
+      ).map((acr) => {
+        const entry = Object.entries(acr)[0];
+        return {
+          acronym: entry[0],
+          definition: entry[1],
+        };
+      })
 
+      console.log(dataFromJsonFile);
+      
       const newAcronym = new Acronym({
         data: dataFromJsonFile,
         name: "admin"
@@ -72,6 +80,7 @@ const swaggerOptions = {
 
       newAcronym.save()
       .catch()
+
     }
 
   }
