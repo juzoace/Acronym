@@ -10,8 +10,8 @@
     return { success: true, message: title };
   }
   
-  exports.successData = (data) => {
-    return { success: true, payload: data };
+  exports.successData = (data, title) => {
+    return { success: true, payload: data, message: title };
   }
   
   exports.updateData = (payload = {}) => {

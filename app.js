@@ -18,8 +18,6 @@ app.use(bodyParser.urlencoded({
 app.use(express.json());
 app.use(cors());
 
-// Bring in the route
-app.use(require('./acronymRoute'));
 
 // Swagger Open Api Options Definition 
 const swaggerOptions = {
@@ -40,12 +38,15 @@ const swaggerOptions = {
       }
     },
     
-    apis: ['./routes/*.js']
+    apis: ['./acronymRoute.js']
   };
   
   const swaggerDocs = swaggerJsDoc(swaggerOptions);
+ 
+  // Bring in the route
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-  
+  app.use(require('./acronymRoute'));
+
     // Connect the database
   mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.database}`, { useNewUrlParser: true }).then(() => {
       console.log(`Database connected successfully`)
@@ -53,7 +54,6 @@ const swaggerOptions = {
       console.log(`Unable to connect with the database ${err}`)
   });
   
-// Check if admin has already put a data into the database
   const populateData = async () => {
 
     let adminData = await Acronym.findOne({ name: "admin" })
@@ -71,7 +71,7 @@ const swaggerOptions = {
         };
       })
 
-      console.log(dataFromJsonFile);
+      // console.log(dataFromJsonFile);
       
       const newAcronym = new Acronym({
         data: dataFromJsonFile,
@@ -79,7 +79,6 @@ const swaggerOptions = {
       })
 
       newAcronym.save()
-      .catch()
 
     }
 
